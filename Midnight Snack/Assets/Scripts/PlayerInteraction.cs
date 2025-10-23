@@ -18,13 +18,12 @@ public class PlayerInteraction : MonoBehaviour
     {
         CheckForInteractables();
 
-        // Check for interaction input
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (lookItem != null)
             {
-                // We are looking at an item
-                PickUpItem(lookItem);
+                // We are looking at an existing item
+                HoldExistingItem(lookItem);
             }
             else if (lookDoor != null)
             {
@@ -36,21 +35,11 @@ public class PlayerInteraction : MonoBehaviour
 
     private void CheckForInteractables()
     {
-        // Clear our "look" targets
+        // Clear "look" targets
         lookItem = null;
         lookDoor = null;
 
-        if (heldItem != null)
-        {
-            // If we're holding something, don't look for other items
-            if (captionUI != null)
-            {
-                captionUI.SetActive(false);
-            }
-            return;
-        }
-
-        // Find the closest collider within our interaction cone
+        // Find the closest collider in our interaction cone
         Collider closestCollider = null;
         float minDistance = float.MaxValue;
 
@@ -67,7 +56,7 @@ public class PlayerInteraction : MonoBehaviour
 
             if (angle <= interactionAngle)
             {
-                // Check if it's the closest one so far
+                // Check if it's the closest one
                 float distance = Vector3.Distance(mainCamera.position, hitCollider.transform.position);
 
                 if (distance < minDistance)
@@ -78,38 +67,43 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        // We found the closest object, now check what it is
+        // We found the closest object, check what it is
         if (closestCollider != null)
         {
-            // Check if it's a pickupable item
-            Pickupable item = closestCollider.GetComponent<Pickupable>();
-            if (item != null)
+            // Only interact with items if not holding one
+            if (heldItem == null)
             {
-                lookItem = item;
-                captionPromptText.text = "Press [E] to pick up " + item.itemName;
-                captionUI.SetActive(true);
-                return; // Found an item, we're done
+                // Check if it's a pickupable item
+                Pickupable item = closestCollider.GetComponent<Pickupable>();
+                if (item != null)
+                {
+                    lookItem = item;
+                    captionPromptText.text = "Press [E] to pick up " + item.itemName;
+                    captionUI.SetActive(true);
+                    return; // Found item
+                }
             }
 
-            // Check if it's a door
+            // We can always interact with doors
             InteractableDoor door = closestCollider.GetComponent<InteractableDoor>();
             if (door != null)
             {
                 lookDoor = door;
                 captionPromptText.text = "Press [E] to " + (door.IsOpen() ? "close" : "open") + " Door";
                 captionUI.SetActive(true);
-                return; // Found a door, we're done
+                return; // Found door
             }
         }
 
-        // If we hit nothing, or the closest thing isn't interactable
+        // If we hit nothing interactable
         if (captionUI != null)
         {
             captionUI.SetActive(false);
         }
     }
 
-    private void PickUpItem(Pickupable item)
+    // Handles picking up items already in the world
+    private void HoldExistingItem(Pickupable item)
     {
         heldItem = item.gameObject;
 
@@ -118,7 +112,7 @@ public class PlayerInteraction : MonoBehaviour
         heldItem.transform.localPosition = item.positionOffset;
         heldItem.transform.localRotation = Quaternion.Euler(item.rotationOffset);
 
-        // Disable physics and collider
+        // Disable physics/collider
         Collider col = heldItem.GetComponent<Collider>();
         if (col != null)
         {
@@ -130,9 +124,15 @@ public class PlayerInteraction : MonoBehaviour
             rb.isKinematic = true;
         }
 
-        // Hide the UI
+        ClearLookTargets();
+    }
+
+    // Helper function to clear UI/targets
+    private void ClearLookTargets()
+    {
         lookItem = null;
-        lookDoor = null; // Make sure this is cleared
+        lookDoor = null;
+
         if (captionUI != null)
         {
             captionUI.SetActive(false);
