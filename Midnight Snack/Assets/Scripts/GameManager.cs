@@ -1,21 +1,23 @@
 using UnityEngine;
+using System.Collections;
 
 // This script manages the main story events
 public class GameManager : MonoBehaviour
 {
     // Singleton pattern
     public static GameManager Instance { get; private set; }
-
-    // Story Event Flags
     public bool hasPlayerPickedUpBurger = false;
     public bool hasPlayerUsedMicrowave = false;
-    public bool hasPlayerLeftMoney = false;
     public bool isPowerOut = false;
+    public bool knowsFuseIsMissing = false;
+    public bool hasTool = false;
+    public bool hasFuse = false;
     public bool hasPlayerRestoredPower = false;
     public bool isMonsterActive = false;
 
-    // Object References
+    public float powerOutageDelay = 10f;
     public GameObject allStoreLights;
+    public GameObject bathroomLights;
     public GameObject bodyToAppear;
     public GameObject monsterAI;
     public InteractableDoor backRoomDoor;
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
     {
         // Set the initial state of the game
         if (allStoreLights != null) allStoreLights.SetActive(true);
+        if (bathroomLights != null) bathroomLights.SetActive(true);
         if (bodyToAppear != null) bodyToAppear.SetActive(false);
         if (monsterAI != null) monsterAI.SetActive(false);
     }
@@ -52,12 +55,20 @@ public class GameManager : MonoBehaviour
     {
         if (hasPlayerUsedMicrowave) return;
         hasPlayerUsedMicrowave = true;
+        
+        // Start the 10-second timer
+        StartCoroutine(StartPowerOutageTimer());
     }
     
-    public void OnMoneyLeft()
+    public void OnPlayerGotTool()
     {
-        if (hasPlayerLeftMoney) return;
-        hasPlayerLeftMoney = true;
+        hasTool = true;
+    }
+
+    public void OnPlayerGotFuse()
+    {
+        hasFuse = true;
+        if (bathroomLights != null) bathroomLights.SetActive(false);
     }
 
     public void OnPowerRestored()
@@ -65,19 +76,30 @@ public class GameManager : MonoBehaviour
         if (hasPlayerRestoredPower) return;
         hasPlayerRestoredPower = true;
         isPowerOut = false;
+        
+        if (allStoreLights != null) allStoreLights.SetActive(true);
+        
+        if (bodyToAppear != null) bodyToAppear.SetActive(true);
+        TriggerMonsterReveal();
     }
 
-
     // --- Helper Functions ---
+
+    private IEnumerator StartPowerOutageTimer()
+    {
+        yield return new WaitForSeconds(powerOutageDelay);
+        TriggerPowerOutage();
+    }
+
     private void TriggerPowerOutage()
     {
         isPowerOut = true;
-        // Power outage logic goes here
+        if (allStoreLights != null) allStoreLights.SetActive(false);
     }
 
     private void TriggerMonsterReveal()
     {
         isMonsterActive = true;
-        // Monster logic goes here
+        if (monsterAI != null) monsterAI.SetActive(true);
     }
 }

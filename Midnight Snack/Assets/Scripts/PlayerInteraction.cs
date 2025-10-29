@@ -170,11 +170,20 @@ public class PlayerInteraction : MonoBehaviour
         // Re-enable collider so it can sit in the microwave
         Collider col = itemToPlace.GetComponent<Collider>();
         if (col != null) col.enabled = true;
-        
+
         Rigidbody rb = itemToPlace.GetComponent<Rigidbody>();
         if (rb != null) rb.isKinematic = false;
 
         return itemToPlace;
+    }
+
+        public void ShowPrompt(string message)
+    {
+        if (captionUI != null)
+        {
+            captionPromptText.text = message;
+            captionUI.SetActive(true);
+        }
     }
 
     // Helper function to clear UI/targets
