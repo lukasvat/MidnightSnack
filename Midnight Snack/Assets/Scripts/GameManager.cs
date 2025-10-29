@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public bool hasFuse = false;
     public bool hasPlayerRestoredPower = false;
     public bool isMonsterActive = false;
-
+    public bool knowsToolIsNeeded = false;
     public float powerOutageDelay = 10f;
     public GameObject allStoreLights;
     public GameObject bathroomLights;

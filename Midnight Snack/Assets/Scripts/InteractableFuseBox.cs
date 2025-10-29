@@ -9,55 +9,57 @@ public class InteractableFuseBox : MonoBehaviour
     }
     public FuseBoxType boxType;
 
-    // Called by PlayerInteraction.cs
+    public string GetPrompt()
+    {
+        return "Press [E] to inspect fuse box";
+    }
+
+    // Called by PlayerInteraction.cs when E is pressed
     public void Interact(PlayerInteraction player)
     {
-        // Use GameManager to check story flags
         GameManager gm = GameManager.Instance;
 
         switch (boxType)
         {
             case FuseBoxType.BackRoom:
-                if (!gm.isPowerOut)
+                if (gm.isPowerOut && gm.hasFuse)
                 {
-                    player.ShowPrompt("Power seems to be working fine.");
-                }
-                else if (gm.hasFuse)
-                {
-                    player.ShowPrompt("Fuse inserted. Power is back on!");
+                    // Restore Power
                     gm.OnPowerRestored();
-                    // Disable this so it can't be used again
+                    player.ShowPrompt("Power restored!");
                     this.enabled = false;
+                }
+                else if (gm.isPowerOut && !gm.hasFuse)
+                {
+                    // Set the story flag
+                    gm.knowsFuseIsMissing = true;
+                    player.ShowPrompt("A fuse is missing... Maybe the bathroom has one.");
                 }
                 else
                 {
-                    // Power is out, player has no fuse
-                    player.ShowPrompt("A fuse is missing... Maybe the bathroom has one.");
-                    gm.knowsFuseIsMissing = true;
+                    // Power is on
+                    player.ShowPrompt("Power seems to be working fine.");
                 }
                 break;
 
             case FuseBoxType.Bathroom:
-                if (!gm.knowsFuseIsMissing)
+                if (gm.knowsFuseIsMissing && !gm.hasFuse && gm.hasTool)
                 {
-                    player.ShowPrompt("Just a fuse box.");
+                    // Get the fuse
+                    gm.OnPlayerGotFuse();
+                    player.ShowPrompt("Got the fuse!");
+                    this.enabled = false; // Disable this box
                 }
-                else if (gm.hasFuse)
+                else if (gm.knowsFuseIsMissing && !gm.hasTool)
                 {
-                    player.ShowPrompt("I already got the fuse from here.");
-                }
-                else if (!gm.hasTool)
-                {
-                    // Player knows fuse is missing, but has no tool
-                    player.ShowPrompt("It's locked. I need something to break it open.");
+                    // Remind player
+                    player.ShowPrompt("It's locked. I need to find a tool.");
+                    gm.knowsToolIsNeeded = true;
                 }
                 else
                 {
-                    // Player has tool
-                    player.ShowPrompt("Got the fuse!");
-                    gm.OnPlayerGotFuse();
-                    // Disable this so it can't be used again
-                    this.enabled = false;
+                    // Player doesn't need to be here
+                    player.ShowPrompt("Just a fuse box.");
                 }
                 break;
         }
