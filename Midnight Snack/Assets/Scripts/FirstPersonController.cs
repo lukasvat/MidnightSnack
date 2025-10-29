@@ -71,6 +71,6 @@ public class FirstPersonCamera : MonoBehaviour
         Vector3 moveDirection = transform.forward * verticalInput + transform.right * horizontalInput;
 
         // Apply movement using the Character Controller
-        characterController.Move(moveDirection.normalized * movementSpeed * Time.deltaTime);
+        characterController.SimpleMove(moveDirection.normalized * movementSpeed);
     }
 }

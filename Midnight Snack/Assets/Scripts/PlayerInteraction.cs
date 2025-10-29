@@ -13,6 +13,7 @@ public class PlayerInteraction : MonoBehaviour
     private GameObject heldItem = null;
     private Pickupable lookItem = null;
     private InteractableDoor lookDoor = null;
+    private InteractableMicrowave lookMicrowave = null;
 
     void Update()
     {
@@ -30,6 +31,13 @@ public class PlayerInteraction : MonoBehaviour
                 // We are looking at a door
                 lookDoor.Interact();
             }
+            else if (lookMicrowave != null)
+            {
+                // Place the item we're holding into the microwave
+                GameObject itemToPlace = PlaceHeldItem();
+                lookMicrowave.PlaceBurger(itemToPlace);
+                ClearLookTargets();
+            }
         }
     }
 
@@ -38,6 +46,7 @@ public class PlayerInteraction : MonoBehaviour
         // Clear "look" targets
         lookItem = null;
         lookDoor = null;
+        lookMicrowave = null;
 
         // Find the closest collider in our interaction cone
         Collider closestCollider = null;
@@ -66,32 +75,57 @@ public class PlayerInteraction : MonoBehaviour
                 }
             }
         }
-
+        
         // We found the closest object, check what it is
-        if (closestCollider != null)
+        if (closestCollider == null)
         {
-            // Only interact with items if not holding one
-            if (heldItem == null)
+            if (captionUI != null) captionUI.SetActive(false);
+            return;
+        }
+
+        // --- Interaction Logic ---
+        // Check for interactables based on whether we are holding an item
+
+        if (heldItem != null)
+        {
+            // We are holding something. Look for Microwaves or Doors.
+            InteractableMicrowave microwave = closestCollider.GetComponent<InteractableMicrowave>();
+            if (microwave != null)
             {
-                // Check if it's a pickupable item
-                Pickupable item = closestCollider.GetComponent<Pickupable>();
-                if (item != null)
-                {
-                    lookItem = item;
-                    captionPromptText.text = "Press [E] to pick up " + item.itemName;
-                    captionUI.SetActive(true);
-                    return; // Found item
-                }
+                lookMicrowave = microwave;
+                captionPromptText.text = "Press [E] to use Microwave";
+                captionUI.SetActive(true);
+                return;
             }
 
-            // We can always interact with doors
             InteractableDoor door = closestCollider.GetComponent<InteractableDoor>();
             if (door != null)
             {
                 lookDoor = door;
                 captionPromptText.text = "Press [E] to " + (door.IsOpen() ? "close" : "open") + " Door";
                 captionUI.SetActive(true);
-                return; // Found door
+                return;
+            }
+        }
+        else
+        {
+            // We are NOT holding anything. Look for Pickups or Doors.
+            Pickupable item = closestCollider.GetComponent<Pickupable>();
+            if (item != null)
+            {
+                lookItem = item;
+                captionPromptText.text = "Press [E] to pick up " + item.itemName;
+                captionUI.SetActive(true);
+                return;
+            }
+
+            InteractableDoor door = closestCollider.GetComponent<InteractableDoor>();
+            if (door != null)
+            {
+                lookDoor = door;
+                captionPromptText.text = "Press [E] to " + (door.IsOpen() ? "close" : "open") + " Door";
+                captionUI.SetActive(true);
+                return;
             }
         }
 
@@ -127,11 +161,28 @@ public class PlayerInteraction : MonoBehaviour
         ClearLookTargets();
     }
 
+    // "drop" the item from our hand
+    private GameObject PlaceHeldItem()
+    {
+        GameObject itemToPlace = heldItem;
+        heldItem = null;
+
+        // Re-enable collider so it can sit in the microwave
+        Collider col = itemToPlace.GetComponent<Collider>();
+        if (col != null) col.enabled = true;
+        
+        Rigidbody rb = itemToPlace.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = false;
+
+        return itemToPlace;
+    }
+
     // Helper function to clear UI/targets
     private void ClearLookTargets()
     {
         lookItem = null;
         lookDoor = null;
+        lookMicrowave = null;
 
         if (captionUI != null)
         {
