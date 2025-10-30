@@ -198,6 +198,16 @@ private void HoldExistingItem(Pickupable item)
         return itemToPlace;
     }
 
+    public void DropAndDestroyHeldItem()
+    {
+        if (heldItem != null)
+        {
+            GameObject itemToDestroy = heldItem;
+            heldItem = null;
+            Destroy(itemToDestroy);
+        }
+    }
+
     public void ShowPrompt(string message)
     {
         if (captionUI != null)

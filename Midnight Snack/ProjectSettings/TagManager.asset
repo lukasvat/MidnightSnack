@@ -6,6 +6,8 @@ TagManager:
   tags:
   - HandSocket
   - PlayerHand
+  - SkyboxCamera
+  - phoneLight
   layers:
   - Default
   - TransparentFX

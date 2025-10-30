@@ -48,6 +48,7 @@ public class InteractableFuseBox : MonoBehaviour
                     // Get the fuse
                     gm.OnPlayerGotFuse();
                     player.ShowPrompt("Got the fuse!");
+                    player.DropAndDestroyHeldItem();
                     this.enabled = false; // Disable this box
                 }
                 else if (gm.knowsFuseIsMissing && !gm.hasTool)

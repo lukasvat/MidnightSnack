@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public float powerOutageDelay = 10f;
     public GameObject allStoreLights;
     public GameObject bathroomLights;
+    public GameObject phoneLight;
     public GameObject bodyToAppear;
     public GameObject monsterAI;
     public InteractableDoor backRoomDoor;
@@ -42,6 +43,7 @@ public class GameManager : MonoBehaviour
         if (bathroomLights != null) bathroomLights.SetActive(true);
         if (bodyToAppear != null) bodyToAppear.SetActive(false);
         if (monsterAI != null) monsterAI.SetActive(false);
+        if (phoneLight != null) phoneLight.SetActive(false);
     }
 
     // --- Public Event Functions ---
@@ -76,8 +78,9 @@ public class GameManager : MonoBehaviour
         if (hasPlayerRestoredPower) return;
         hasPlayerRestoredPower = true;
         isPowerOut = false;
-        
+
         if (allStoreLights != null) allStoreLights.SetActive(true);
+        if (phoneLight != null) phoneLight.SetActive(false);
         
         if (bodyToAppear != null) bodyToAppear.SetActive(true);
         TriggerMonsterReveal();
@@ -95,6 +98,7 @@ public class GameManager : MonoBehaviour
     {
         isPowerOut = true;
         if (allStoreLights != null) allStoreLights.SetActive(false);
+        if (phoneLight != null) phoneLight.SetActive(true);
     }
 
     private void TriggerMonsterReveal()
