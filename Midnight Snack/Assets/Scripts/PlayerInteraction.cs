@@ -159,15 +159,11 @@ private void CheckForInteractables()
 private void HoldExistingItem(Pickupable item)
     {
         heldItem = item.gameObject;
-
         heldItem.transform.SetParent(handSocket);
 
         // Set its local position and rotation relative to the hand
         heldItem.transform.localPosition = item.positionOffset;
         heldItem.transform.localRotation = Quaternion.Euler(item.rotationOffset);
-
-        // Reset the scale
-        heldItem.transform.localScale = Vector3.one;
 
         Collider col = heldItem.GetComponent<Collider>();
         if (col != null) col.enabled = false;
