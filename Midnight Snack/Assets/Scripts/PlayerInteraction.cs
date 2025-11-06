@@ -117,10 +117,6 @@ private void CheckForInteractables()
                         lookItem = item;
                         ShowPrompt("Press [E] to pick up " + item.itemName);
                     }
-                    else
-                    {
-                        ShowPrompt("I don't need this right now.");
-                    }
                 }
                 else
                 {
