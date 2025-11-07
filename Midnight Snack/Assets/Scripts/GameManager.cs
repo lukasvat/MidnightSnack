@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     public bool isMonsterActive = false;
     public bool knowsToolIsNeeded = false;
     public float powerOutageDelay = 10f;
+    public float monsterSpawnDelay = 15f;
     public GameObject allStoreLights;
     public GameObject bathroomLights;
     public GameObject phoneLight;
@@ -25,7 +26,6 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Setup the Singleton
         if (Instance != null && Instance != this)
         {
             Destroy(this.gameObject);
@@ -81,13 +81,14 @@ public class GameManager : MonoBehaviour
 
         if (allStoreLights != null) allStoreLights.SetActive(true);
         if (phoneLight != null) phoneLight.SetActive(false);
-        
+
         if (bodyToAppear != null) bodyToAppear.SetActive(true);
-        TriggerMonsterReveal();
+
+        // Start the monster spawn timer
+        StartCoroutine(ActivateMonsterAfterDelay());
     }
 
     // --- Helper Functions ---
-
     private IEnumerator StartPowerOutageTimer()
     {
         yield return new WaitForSeconds(powerOutageDelay);
@@ -99,6 +100,12 @@ public class GameManager : MonoBehaviour
         isPowerOut = true;
         if (allStoreLights != null) allStoreLights.SetActive(false);
         if (phoneLight != null) phoneLight.SetActive(true);
+    }
+    private IEnumerator ActivateMonsterAfterDelay()
+    {
+        // Wait for 15 seconds
+        yield return new WaitForSeconds(monsterSpawnDelay);
+        TriggerMonsterReveal();
     }
 
     private void TriggerMonsterReveal()
