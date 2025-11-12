@@ -31,9 +31,12 @@ public class GameManager : MonoBehaviour
     public GameObject phoneLight;
     public GameObject bodyToAppear;
     public GameObject monsterAI;
+    public MonoBehaviour playerControlScript;
+    public MonsterController monsterController;
 
     // UI
     public TextMeshProUGUI mainCaption;
+    public GameObject gameOverUI;
     private Coroutine currentCaptionCoroutine = null;
 
     void Awake()
@@ -92,7 +95,7 @@ public class GameManager : MonoBehaviour
         // Start the 10-second timer
         StartCoroutine(StartPowerOutageTimer());
     }
-    
+
     public void OnPlayerGotTool()
     {
         hasTool = true;
@@ -175,14 +178,45 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
-        // Stop the game
-        Time.timeScale = 0f;
+        // Disable Player Controls
+        if (playerControlScript != null)
+        {
+            playerControlScript.enabled = false;
+        }
 
-        // Unlock the mouse cursor
+        // Lock the mouse cursor state
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        // Stop the Monster's Movement
+        if (monsterController != null)
+        {
+            monsterController.enabled = false;
+        }
+
+        // Trigger the Jump Scare Action
+        StartCoroutine(monsterController.JumpScareSequence());
+    }
+    
+    public void ShowGameOverUI()
+    {
+        // Show the UI and stop all time
+        if (gameOverUI != null)
+        {
+            gameOverUI.SetActive(true);
+        }
+
+        // Stop time
+        Time.timeScale = 0f; 
+
+        // Unlock the cursor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
-        // Load the "Game Over" scene
-        SceneManager.LoadScene("GameOverScene");
     }
-}
+    
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenuScene");
+    }
+    }

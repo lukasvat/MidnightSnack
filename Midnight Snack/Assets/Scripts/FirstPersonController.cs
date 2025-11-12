@@ -74,12 +74,15 @@ public class FirstPersonCamera : MonoBehaviour
         characterController.SimpleMove(moveDirection.normalized * movementSpeed);
     }
 
-    private void OnControllerColliderHit(ControllerColliderHit hit)
+    // Called when CharacterController enters a Trigger.
+    private void OnTriggerEnter(Collider other)
     {
-        // Check if the object we collided with has the "Monster" tag
-        if (hit.gameObject.CompareTag("Monster"))
+        // Check if the trigger we entered has the "Monster" tag
+        if (other.gameObject.CompareTag("Monster"))
         {
-            // We've been caught
+            Debug.Log("Entered the Monster's trigger");
+            
+            // Call the EndGame function on the GameManager
             GameManager.Instance.EndGame();
         }
     }
