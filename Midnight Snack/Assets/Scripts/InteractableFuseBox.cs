@@ -18,6 +18,7 @@ public class InteractableFuseBox : MonoBehaviour
     public void Interact(PlayerInteraction player)
     {
         GameManager gm = GameManager.Instance;
+        float captionDuration = 5f;
 
         switch (boxType)
         {
@@ -26,19 +27,19 @@ public class InteractableFuseBox : MonoBehaviour
                 {
                     // Restore Power
                     gm.OnPowerRestored();
-                    player.ShowPrompt("Power restored!");
+                    gm.ShowTemporaryMainCaption("Power restored!", captionDuration);
                     this.enabled = false;
                 }
                 else if (gm.isPowerOut && !gm.hasFuse)
                 {
                     // Set the story flag
                     gm.knowsFuseIsMissing = true;
-                    player.ShowPrompt("A fuse is missing... Maybe the bathroom has one.");
+                    gm.ShowTemporaryMainCaption("A fuse is missing... Maybe the bathroom has one.", captionDuration);
                 }
                 else
                 {
                     // Power is on
-                    player.ShowPrompt("Power seems to be working fine.");
+                    gm.ShowTemporaryMainCaption("Power seems to be working fine.", captionDuration);
                 }
                 break;
 
@@ -47,20 +48,20 @@ public class InteractableFuseBox : MonoBehaviour
                 {
                     // Get the fuse
                     gm.OnPlayerGotFuse();
-                    player.ShowPrompt("Got the fuse!");
+                    gm.ShowTemporaryMainCaption("Got the fuse!", captionDuration);
                     player.DropAndDestroyHeldItem();
                     this.enabled = false; // Disable this box
                 }
                 else if (gm.knowsFuseIsMissing && !gm.hasTool)
                 {
                     // Remind player
-                    player.ShowPrompt("It's locked. I need to find a tool.");
+                    gm.ShowTemporaryMainCaption("It's locked. I need to find a tool.", captionDuration);
                     gm.knowsToolIsNeeded = true;
                 }
                 else
                 {
                     // Player doesn't need to be here
-                    player.ShowPrompt("Just a fuse box.");
+                    gm.ShowTemporaryMainCaption("Just a fuse box.", captionDuration);
                 }
                 break;
         }

@@ -6,8 +6,7 @@ public class PlayerInteraction : MonoBehaviour
 {
     public Transform mainCamera;
     public Transform handSocket;
-    public GameObject captionUI;
-    public TextMeshProUGUI captionPromptText;
+    public TextMeshProUGUI controlCaption;
     public float interactionDistance = 2.5f;
     public float interactionAngle = 45f;
     private GameObject heldItem = null;
@@ -17,7 +16,7 @@ public class PlayerInteraction : MonoBehaviour
     private InteractableFuseBox lookFuseBox = null;
     private float promptLockoutTimer = 0f;
     private float promptLockoutDuration = 2f;
-
+    GameManager gm = GameManager.Instance;
 
     void Update()
     {
@@ -80,7 +79,7 @@ private void CheckForInteractables()
         
         if (closestCollider == null)
         {
-            if (captionUI != null) captionUI.SetActive(false);
+            if (controlCaption != null) controlCaption.gameObject.SetActive(false);
             return;
         }
 
@@ -95,11 +94,7 @@ private void CheckForInteractables()
                 if (heldItemComponent != null && heldItemComponent.itemType == Pickupable.ItemType.Generic)
                 {
                     lookMicrowave = microwave;
-                    ShowPrompt("Press [E] to use Microwave");
-                }
-                else
-                {
-                    ShowPrompt("I can't put this in the microwave.");
+                    ShowControlCaption("Press [E] to use Microwave");
                 }
                 return;
             }
@@ -115,13 +110,13 @@ private void CheckForInteractables()
                     if (GameManager.Instance.knowsToolIsNeeded)
                     {
                         lookItem = item;
-                        ShowPrompt("Press [E] to pick up " + item.itemName);
+                        ShowControlCaption("Press [E] to pick up " + item.itemName);
                     }
                 }
                 else
                 {
                     lookItem = item;
-                    ShowPrompt("Press [E] to pick up " + item.itemName);
+                    ShowControlCaption("Press [E] to pick up " + item.itemName);
                 }
                 return; // Found an item, stop here.
             }
@@ -132,7 +127,7 @@ private void CheckForInteractables()
         if (door != null)
         {
             lookDoor = door;
-            ShowPrompt("Press [E] to " + (door.IsOpen() ? "close" : "open") + " Door");
+            ShowControlCaption("Press [E] to " + (door.IsOpen() ? "close" : "open") + " Door");
             return;
         }
 
@@ -141,14 +136,14 @@ private void CheckForInteractables()
         if (fuseBox != null)
         {
             lookFuseBox = fuseBox;
-            ShowPrompt(fuseBox.GetPrompt());
+            ShowControlCaption(fuseBox.GetPrompt());
             return;
         }
 
         // If we hit nothing interactable
-        if (captionUI != null)
+        if (controlCaption != null)
         {
-            captionUI.SetActive(false);
+            controlCaption.gameObject.SetActive(false);
         }
     }
 
@@ -200,12 +195,12 @@ private void HoldExistingItem(Pickupable item)
         }
     }
 
-    public void ShowPrompt(string message)
+    public void ShowControlCaption(string message)
     {
-        if (captionUI != null)
+        if (controlCaption != null)
         {
-            captionPromptText.text = message;
-            captionUI.SetActive(true);
+            controlCaption.text = message;
+            controlCaption.gameObject.SetActive(true);
         }
     }
 
@@ -216,9 +211,9 @@ private void HoldExistingItem(Pickupable item)
         lookMicrowave = null;
         lookFuseBox = null;
 
-        if (captionUI != null)
+        if (controlCaption != null)
         {
-            captionUI.SetActive(false);
+            controlCaption.gameObject.SetActive(false);
         }
     }
 }

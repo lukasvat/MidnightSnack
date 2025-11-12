@@ -73,4 +73,14 @@ public class FirstPersonCamera : MonoBehaviour
         // Apply movement using the Character Controller
         characterController.SimpleMove(moveDirection.normalized * movementSpeed);
     }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        // Check if the object we collided with has the "Monster" tag
+        if (hit.gameObject.CompareTag("Monster"))
+        {
+            // We've been caught
+            GameManager.Instance.EndGame();
+        }
+    }
 }

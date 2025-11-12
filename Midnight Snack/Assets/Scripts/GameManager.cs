@@ -1,11 +1,16 @@
 using UnityEngine;
+using TMPro;
 using System.Collections;
+using UnityEditor.VersionControl;
+using UnityEngine.SceneManagement;
 
 // This script manages the main story events
 public class GameManager : MonoBehaviour
 {
     // Singleton pattern
     public static GameManager Instance { get; private set; }
+
+    // Events
     public bool hasPlayerPickedUpBurger = false;
     public bool hasPlayerUsedMicrowave = false;
     public bool isPowerOut = false;
@@ -15,15 +20,21 @@ public class GameManager : MonoBehaviour
     public bool hasPlayerRestoredPower = false;
     public bool isMonsterActive = false;
     public bool knowsToolIsNeeded = false;
+
+    // Timing
     public float powerOutageDelay = 10f;
-    public float monsterSpawnDelay = 15f;
+    public float monsterSpawnDelay = 10f;
+
+    //Objects
     public GameObject allStoreLights;
     public GameObject bathroomLights;
     public GameObject phoneLight;
     public GameObject bodyToAppear;
     public GameObject monsterAI;
-    public GameObject monsterNavMesh;
-    public InteractableDoor backRoomDoor;
+
+    // UI
+    public TextMeshProUGUI mainCaption;
+    private Coroutine currentCaptionCoroutine = null;
 
     void Awake()
     {
@@ -40,12 +51,28 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         // Set the initial state of the game
+        mainCaption.gameObject.SetActive(false);
         if (allStoreLights != null) allStoreLights.SetActive(true);
         if (bathroomLights != null) bathroomLights.SetActive(true);
         if (bodyToAppear != null) bodyToAppear.SetActive(false);
         if (monsterAI != null) monsterAI.SetActive(false);
         if (phoneLight != null) phoneLight.SetActive(false);
-        if (monsterNavMesh != null) monsterNavMesh.SetActive(true);
+
+        //Show first caption
+        ShowTemporaryMainCaption("I'm starving. Just need to grab a bite real quick.", 5f);
+    }
+
+    public void ShowMainCaption(string message)
+    {
+        // shows a permanent caption
+        if (currentCaptionCoroutine != null)
+        {
+            StopCoroutine(currentCaptionCoroutine);
+            currentCaptionCoroutine = null;
+        }
+
+        mainCaption.text = message;
+        mainCaption.gameObject.SetActive(true);
     }
 
     // --- Public Event Functions ---
@@ -53,13 +80,15 @@ public class GameManager : MonoBehaviour
     {
         if (hasPlayerPickedUpBurger) return;
         hasPlayerPickedUpBurger = true;
+        ShowTemporaryMainCaption("This looks good, but I need to heat it up.", 5f);
     }
 
     public void OnMicrowaveUsed()
     {
         if (hasPlayerUsedMicrowave) return;
         hasPlayerUsedMicrowave = true;
-        
+        ShowTemporaryMainCaption("30 seconds should do it.", 5f);
+
         // Start the 10-second timer
         StartCoroutine(StartPowerOutageTimer());
     }
@@ -67,6 +96,7 @@ public class GameManager : MonoBehaviour
     public void OnPlayerGotTool()
     {
         hasTool = true;
+        ShowTemporaryMainCaption("I need to go back to get the fuse from the bathroom.", 5f);
     }
 
     public void OnPlayerGotFuse()
@@ -83,7 +113,6 @@ public class GameManager : MonoBehaviour
 
         if (allStoreLights != null) allStoreLights.SetActive(true);
         if (phoneLight != null) phoneLight.SetActive(false);
-
         if (bodyToAppear != null) bodyToAppear.SetActive(true);
 
         // Start the monster spawn timer
@@ -102,6 +131,7 @@ public class GameManager : MonoBehaviour
         isPowerOut = true;
         if (allStoreLights != null) allStoreLights.SetActive(false);
         if (phoneLight != null) phoneLight.SetActive(true);
+        ShowTemporaryMainCaption("Damn. Maybe there's a fuse box somewhere.", 5f);
     }
     private IEnumerator ActivateMonsterAfterDelay()
     {
@@ -114,5 +144,45 @@ public class GameManager : MonoBehaviour
     {
         isMonsterActive = true;
         if (monsterAI != null) monsterAI.SetActive(true);
+        ShowTemporaryMainCaption("What the hell is that! I need to get to my car!", 5f);
+    }
+
+    /// Shows a story caption that will disappear.
+    public void ShowTemporaryMainCaption(string message, float duration)
+    {
+        // Stop any previous caption coroutine
+        if (currentCaptionCoroutine != null)
+        {
+            StopCoroutine(currentCaptionCoroutine);
+        }
+
+        mainCaption.text = message;
+        mainCaption.gameObject.SetActive(true);
+
+        // Start the new timer
+        currentCaptionCoroutine = StartCoroutine(ClearMainCaptionAfterDelay(duration));
+    }
+
+    private IEnumerator ClearMainCaptionAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // Clear the text and hide the UI
+        mainCaption.text = "";
+        mainCaption.gameObject.SetActive(false);
+        currentCaptionCoroutine = null;
+    }
+
+    public void EndGame()
+    {
+        // Stop the game
+        Time.timeScale = 0f;
+
+        // Unlock the mouse cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        // Load the "Game Over" scene
+        SceneManager.LoadScene("GameOverScene");
     }
 }
