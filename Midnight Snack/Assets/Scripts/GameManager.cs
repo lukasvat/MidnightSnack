@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     public GameObject phoneLight;
     public GameObject bodyToAppear;
     public GameObject monsterAI;
+    public GameObject monsterNavMesh;
     public InteractableDoor backRoomDoor;
 
     void Awake()
@@ -44,6 +45,7 @@ public class GameManager : MonoBehaviour
         if (bodyToAppear != null) bodyToAppear.SetActive(false);
         if (monsterAI != null) monsterAI.SetActive(false);
         if (phoneLight != null) phoneLight.SetActive(false);
+        if (monsterNavMesh != null) monsterNavMesh.SetActive(true);
     }
 
     // --- Public Event Functions ---
