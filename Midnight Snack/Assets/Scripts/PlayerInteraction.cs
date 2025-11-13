@@ -14,6 +14,7 @@ public class PlayerInteraction : MonoBehaviour
     private InteractableDoor lookDoor = null;
     private InteractableMicrowave lookMicrowave = null;
     private InteractableFuseBox lookFuseBox = null;
+    private InteractableCar lookCar = null;
     private float promptLockoutTimer = 0f;
     private float promptLockoutDuration = 2f;
     GameManager gm = GameManager.Instance;
@@ -48,6 +49,11 @@ public class PlayerInteraction : MonoBehaviour
                 lookFuseBox.Interact(this);
                 promptLockoutTimer = promptLockoutDuration;
             }
+            else if (lookCar != null)
+            {
+                lookCar.Interact();
+                ClearLookTargets();
+            }
         }
     }
 
@@ -76,10 +82,18 @@ private void CheckForInteractables()
                 }
             }
         }
-        
+
         if (closestCollider == null)
         {
             if (controlCaption != null) controlCaption.gameObject.SetActive(false);
+            return;
+        }
+
+        InteractableCar car = closestCollider.GetComponent<InteractableCar>();
+        if (car != null)
+        {
+            lookCar = car;
+            ShowControlCaption(car.GetPrompt());
             return;
         }
 
@@ -210,6 +224,7 @@ private void HoldExistingItem(Pickupable item)
         lookDoor = null;
         lookMicrowave = null;
         lookFuseBox = null;
+        lookCar = null;
 
         if (controlCaption != null)
         {

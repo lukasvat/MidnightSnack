@@ -4,7 +4,7 @@ public class InteractableCar : MonoBehaviour
 {
     public string GetPrompt()
     {
-        return "Press [E] to escape!";
+        return "Press [E] to get in!";
     }
 
     // Called by PlayerInteraction.cs when E is pressed

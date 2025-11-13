@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     // UI
     public TextMeshProUGUI mainCaption;
     public GameObject gameOverUI;
+    public GameObject winUI;
     private Coroutine currentCaptionCoroutine = null;
 
     void Awake()
@@ -55,6 +56,8 @@ public class GameManager : MonoBehaviour
     {
         // Set the initial state of the game
         mainCaption.gameObject.SetActive(false);
+        if (gameOverUI != null) gameOverUI.SetActive(false);
+        if (winUI != null) winUI.SetActive(false);
         if (allStoreLights != null) allStoreLights.SetActive(true);
         if (bathroomLights != null) bathroomLights.SetActive(true);
         if (bodyToAppear != null) bodyToAppear.SetActive(false);
@@ -174,6 +177,32 @@ public class GameManager : MonoBehaviour
         mainCaption.text = "";
         mainCaption.gameObject.SetActive(false);
         currentCaptionCoroutine = null;
+    }
+
+        public void WinGame()
+    {
+        // Disable player controls
+        if (playerControlScript != null)
+        {
+            playerControlScript.enabled = false;
+        }
+
+        // Hide the monster
+        if (monsterController != null)
+        {
+            monsterController.gameObject.SetActive(false);
+        }
+
+        // Show the Win UI
+        if (winUI != null)
+        {
+            winUI.SetActive(true);
+        }
+
+        // Stop time and unlock cursor
+        Time.timeScale = 0f; 
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void EndGame()
