@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     // Timing
     public float powerOutageDelay = 10f;
     public float monsterSpawnDelay = 10f;
+    public float typeSpeed = 0.05f;
 
     //Objects
     public GameObject allStoreLights;
@@ -65,7 +66,7 @@ public class GameManager : MonoBehaviour
         if (phoneLight != null) phoneLight.SetActive(false);
 
         //Show first caption
-        ShowTemporaryMainCaption("I'm starving. Just need to grab a bite real quick.", 5f);
+        ShowTemporaryMainCaption("I'm starving. Let me grab something to eat.", 5f);
     }
 
     public void ShowMainCaption(string message)
@@ -77,8 +78,7 @@ public class GameManager : MonoBehaviour
             currentCaptionCoroutine = null;
         }
 
-        mainCaption.text = message;
-        mainCaption.gameObject.SetActive(true);
+        currentCaptionCoroutine = StartCoroutine(TypeTextCoroutine(message, -1f));
     }
 
     // --- Public Event Functions ---
@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
     {
         if (hasPlayerPickedUpBurger) return;
         hasPlayerPickedUpBurger = true;
-        ShowTemporaryMainCaption("This looks good, but I need to heat it up.", 5f);
+        ShowTemporaryMainCaption("I need to heat this up.", 5f);
     }
 
     public void OnMicrowaveUsed()
@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviour
     public void OnPlayerGotTool()
     {
         hasTool = true;
-        ShowTemporaryMainCaption("I need to go back to get the fuse from the bathroom.", 5f);
+        ShowTemporaryMainCaption("Now to get the fuse from the bathroom.", 5f);
     }
 
     public void OnPlayerGotFuse()
@@ -120,6 +120,8 @@ public class GameManager : MonoBehaviour
         if (allStoreLights != null) allStoreLights.SetActive(true);
         if (phoneLight != null) phoneLight.SetActive(false);
         if (bodyToAppear != null) bodyToAppear.SetActive(true);
+
+        ShowTemporaryMainCaption("The power is restored! Let me check on the microwave.", 5f);
 
         // Start the monster spawn timer
         StartCoroutine(ActivateMonsterAfterDelay());
@@ -141,7 +143,6 @@ public class GameManager : MonoBehaviour
     }
     private IEnumerator ActivateMonsterAfterDelay()
     {
-        // Wait for 15 seconds
         yield return new WaitForSeconds(monsterSpawnDelay);
         TriggerMonsterReveal();
     }
@@ -153,7 +154,6 @@ public class GameManager : MonoBehaviour
         ShowTemporaryMainCaption("What the hell is that! I need to get to my car!", 5f);
     }
 
-    /// Shows a story caption that will disappear.
     public void ShowTemporaryMainCaption(string message, float duration)
     {
         // Stop any previous caption coroutine
@@ -162,20 +162,29 @@ public class GameManager : MonoBehaviour
             StopCoroutine(currentCaptionCoroutine);
         }
 
-        mainCaption.text = message;
-        mainCaption.gameObject.SetActive(true);
-
-        // Start the new timer
-        currentCaptionCoroutine = StartCoroutine(ClearMainCaptionAfterDelay(duration));
+        currentCaptionCoroutine = StartCoroutine(TypeTextCoroutine(message, duration));
     }
-
-    private IEnumerator ClearMainCaptionAfterDelay(float delay)
+    private IEnumerator TypeTextCoroutine(string message, float duration)
     {
-        yield return new WaitForSeconds(delay);
-
-        // Clear the text and hide the UI
         mainCaption.text = "";
-        mainCaption.gameObject.SetActive(false);
+        mainCaption.gameObject.SetActive(true);
+        int totalVisibleCharacters = 0;
+
+        // Loop through each character in the message
+        while (totalVisibleCharacters < message.Length)
+        {
+            mainCaption.text += message[totalVisibleCharacters];
+            totalVisibleCharacters++;
+            yield return new WaitForSecondsRealtime(typeSpeed);
+        }
+
+        // Clear caption after duration
+        if (duration > 0)
+        {
+            yield return new WaitForSecondsRealtime(duration);
+            mainCaption.text = "";
+            mainCaption.gameObject.SetActive(false);
+        }
         currentCaptionCoroutine = null;
     }
 
@@ -205,7 +214,7 @@ public class GameManager : MonoBehaviour
         Cursor.visible = true;
     }
 
-    public void EndGame()
+    public void LoseGame()
     {
         // Disable Player Controls
         if (playerControlScript != null)
@@ -242,7 +251,7 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
-    
+
     public void GoToMainMenu()
     {
         Time.timeScale = 1f;

@@ -5,7 +5,6 @@ public class InteractableDoor : MonoBehaviour
 {
     public float openAngle = 90f;
     public float openSpeed = 2f;
-
     private bool isOpen = false;
     private bool isMoving = false;
     private Quaternion closedRotation;
@@ -49,13 +48,13 @@ public class InteractableDoor : MonoBehaviour
 
         while (time < 1)
         {
-            // Smoothly interpolate between current and target rotation
+            // Interpolate between current and target rotation
             transform.rotation = Quaternion.Slerp(startRotation, targetRotation, time);
             time += Time.deltaTime * openSpeed;
-            yield return null; // Wait for the next frame
+            yield return null;
         }
 
-        // Snap to final rotation to ensure accuracy
+        // Snap to final rotation
         transform.rotation = targetRotation;
 
         // Update state

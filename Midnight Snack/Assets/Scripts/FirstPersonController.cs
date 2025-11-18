@@ -14,16 +14,9 @@ public class FirstPersonCamera : MonoBehaviour
 
     void Start()
     {
-        // Get necessary components
+        // Get components
         characterController = GetComponent<CharacterController>();
         cameraTransform = GetComponentInChildren<Camera>().transform;
-
-        if (cameraTransform == null)
-        {
-            Debug.LogError("FirstPersonCamera: No camera found on child object.");
-            this.enabled = false;
-            return;
-        }
 
         // Lock the cursor to the center of the screen and hide it.
         Cursor.lockState = CursorLockMode.Locked;
@@ -82,8 +75,8 @@ public class FirstPersonCamera : MonoBehaviour
         {
             Debug.Log("Entered the Monster's trigger");
             
-            // Call the EndGame function on the GameManager
-            GameManager.Instance.EndGame();
+            // Call the LoseGame function from GameManager
+            GameManager.Instance.LoseGame();
         }
     }
 }

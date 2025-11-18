@@ -14,7 +14,7 @@ public class InteractableFuseBox : MonoBehaviour
         return "Press [E] to inspect fuse box";
     }
 
-    // Called by PlayerInteraction.cs when E is pressed
+    // Called by PlayerInteraction.cs
     public void Interact(PlayerInteraction player)
     {
         GameManager gm = GameManager.Instance;
@@ -27,7 +27,6 @@ public class InteractableFuseBox : MonoBehaviour
                 {
                     // Restore Power
                     gm.OnPowerRestored();
-                    gm.ShowTemporaryMainCaption("Power restored!", captionDuration);
                     this.enabled = false;
                 }
                 else if (gm.isPowerOut && !gm.hasFuse)

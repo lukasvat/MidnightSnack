@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class InteractableMicrowave : MonoBehaviour
 {
-    [Header("Microwave Setup")]
     public Transform burgerSocket; 
     public GameObject microwaveLight;
     public float rotationSpeed = 30f;
@@ -17,8 +16,8 @@ public class InteractableMicrowave : MonoBehaviour
 
     void Update()
     {
-        // If the microwave is on, rotate the burger
-        if (isRunning && burgerInstance != null)
+        // If the microwave is on & power is on, rotate the burger
+        if (isRunning && burgerInstance != null && !GameManager.Instance.isPowerOut)
         {
             burgerSocket.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
         }

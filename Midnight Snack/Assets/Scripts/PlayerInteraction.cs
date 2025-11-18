@@ -17,7 +17,6 @@ public class PlayerInteraction : MonoBehaviour
     private InteractableCar lookCar = null;
     private float promptLockoutTimer = 0f;
     private float promptLockoutDuration = 2f;
-    GameManager gm = GameManager.Instance;
 
     void Update()
     {
@@ -57,9 +56,11 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-private void CheckForInteractables()
+    private void CheckForInteractables()
     {
         ClearLookTargets();
+
+        GameManager gm = GameManager.Instance;
 
         Collider closestCollider = null;
         float minDistance = float.MaxValue;
@@ -93,7 +94,11 @@ private void CheckForInteractables()
         if (car != null)
         {
             lookCar = car;
-            ShowControlCaption(car.GetPrompt());
+            if (gm.isMonsterActive)
+            {
+                ShowControlCaption(car.GetPrompt());
+            }
+            
             return;
         }
 
@@ -161,29 +166,29 @@ private void CheckForInteractables()
         }
     }
 
-private void HoldExistingItem(Pickupable item)
-    {
-        heldItem = item.gameObject;
-        heldItem.transform.SetParent(handSocket);
-
-        // Set its local position and rotation relative to the hand
-        heldItem.transform.localPosition = item.positionOffset;
-        heldItem.transform.localRotation = Quaternion.Euler(item.rotationOffset);
-
-        Collider col = heldItem.GetComponent<Collider>();
-        if (col != null) col.enabled = false;
-        
-        Rigidbody rb = heldItem.GetComponent<Rigidbody>();
-        if (rb != null) rb.isKinematic = true;
-
-        // Tell GameManager if this is the tool
-        if (item.itemType == Pickupable.ItemType.Tool)
+    private void HoldExistingItem(Pickupable item)
         {
-            GameManager.Instance.OnPlayerGotTool();
-        }
+            heldItem = item.gameObject;
+            heldItem.transform.SetParent(handSocket);
 
-        ClearLookTargets();
-    }
+            // Set its local position and rotation relative to the hand
+            heldItem.transform.localPosition = item.positionOffset;
+            heldItem.transform.localRotation = Quaternion.Euler(item.rotationOffset);
+
+            Collider col = heldItem.GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+            
+            Rigidbody rb = heldItem.GetComponent<Rigidbody>();
+            if (rb != null) rb.isKinematic = true;
+
+            // Tell GameManager if this is the tool
+            if (item.itemType == Pickupable.ItemType.Tool)
+            {
+                GameManager.Instance.OnPlayerGotTool();
+            }
+
+            ClearLookTargets();
+        }
 
     private GameObject PlaceHeldItem()
     {
