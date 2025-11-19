@@ -51,6 +51,9 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
+
+        // Cap Frame Rate at 60 FPS
+        Application.targetFrameRate = 60;
     }
 
     void Start()
