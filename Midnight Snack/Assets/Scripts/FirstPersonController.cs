@@ -123,5 +123,16 @@ public class FirstPersonCamera : MonoBehaviour
             // Call station enter function from GameManager
             GameManager.Instance.OnStationEnter();
         }
+
+        // Check if it is the boundary
+        if (other.gameObject.CompareTag("BoundaryTrigger"))
+        {
+            Debug.Log("Entered the Boundary trigger");
+            
+            // Call station enter function from GameManager
+            GameManager.Instance.ShowTemporaryMainCaption("I shouldn't go too far.", 5f);
+        }
+
+
     }
 }

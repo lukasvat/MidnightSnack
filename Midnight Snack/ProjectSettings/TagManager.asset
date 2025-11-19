@@ -10,6 +10,7 @@ TagManager:
   - phoneLight
   - Monster
   - EntranceTrigger
+  - BoundaryTrigger
   layers:
   - Default
   - TransparentFX
