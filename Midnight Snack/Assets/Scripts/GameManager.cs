@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     // Events
+    public bool hasPlayerEnteredStation = false;
     public bool hasPlayerPickedUpBurger = false;
     public bool hasPlayerUsedMicrowave = false;
     public bool isPowerOut = false;
@@ -85,6 +86,12 @@ public class GameManager : MonoBehaviour
     }
 
     // --- Public Event Functions ---
+    public void OnStationEnter()
+    {
+        if (hasPlayerEnteredStation) return;
+        hasPlayerEnteredStation = true;
+        ShowTemporaryMainCaption("Where is everyone? I'll just have come back later to pay.", 3f);
+    }
     public void OnBurgerPickedUp()
     {
         if (hasPlayerPickedUpBurger) return;

@@ -175,6 +175,11 @@ public class PlayerInteraction : MonoBehaviour
             heldItem.transform.localPosition = item.positionOffset;
             heldItem.transform.localRotation = Quaternion.Euler(item.rotationOffset);
 
+            if (!GameManager.Instance.hasPlayerPickedUpBurger)
+            {
+                GameManager.Instance.OnBurgerPickedUp();
+            }
+
             Collider col = heldItem.GetComponent<Collider>();
             if (col != null) col.enabled = false;
             

@@ -9,6 +9,7 @@ TagManager:
   - SkyboxCamera
   - phoneLight
   - Monster
+  - EntranceTrigger
   layers:
   - Default
   - TransparentFX

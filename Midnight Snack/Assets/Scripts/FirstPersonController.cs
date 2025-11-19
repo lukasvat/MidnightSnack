@@ -7,6 +7,7 @@ public class FirstPersonCamera : MonoBehaviour
     [SerializeField] float mouseSensitivity = 2.0f;
     [SerializeField] float lookUpClamp = 80.0f;
     [SerializeField] float lookDownClamp = -80.0f;
+    [SerializeField] AudioSource footstepAudioSource; 
 
     private float rotationX = 0.0f;
     private Transform cameraTransform;
@@ -21,6 +22,12 @@ public class FirstPersonCamera : MonoBehaviour
         // Lock the cursor to the center of the screen and hide it.
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        // Footstep audio off
+        if (footstepAudioSource != null)
+        {
+            footstepAudioSource.Stop(); 
+        }
     }
 
     void Update()
@@ -65,6 +72,35 @@ public class FirstPersonCamera : MonoBehaviour
 
         // Apply movement using the Character Controller
         characterController.SimpleMove(moveDirection.normalized * movementSpeed);
+
+        // Check if the player is moving
+        bool isMoving = (horizontalInput != 0 || verticalInput != 0);
+    
+        // Check if the CharacterController is on the ground
+        bool isGrounded = characterController.isGrounded;
+
+        // Trigger footstep audio
+        PlayFootstep(isMoving && isGrounded);
+    }
+
+    void PlayFootstep(bool isMoving)
+    {
+        if (isMoving)
+        {
+            // start playing the audio
+            if (!footstepAudioSource.isPlaying)
+            {
+                footstepAudioSource.Play(); 
+            }
+        }
+        else
+        {
+            // stop the audio
+            if (footstepAudioSource.isPlaying)
+            {
+                footstepAudioSource.Stop();
+            }
+        }
     }
 
     // Called when CharacterController enters a Trigger.
@@ -77,6 +113,15 @@ public class FirstPersonCamera : MonoBehaviour
             
             // Call the LoseGame function from GameManager
             GameManager.Instance.LoseGame();
+        }
+
+        // Check if it is the entrance trigger
+        if (other.gameObject.CompareTag("EntranceTrigger"))
+        {
+            Debug.Log("Entered the Entrance trigger");
+            
+            // Call station enter function from GameManager
+            GameManager.Instance.OnStationEnter();
         }
     }
 }
