@@ -16,11 +16,12 @@ public class GameManager : MonoBehaviour
     public bool hasPlayerUsedMicrowave = false;
     public bool isPowerOut = false;
     public bool knowsFuseIsMissing = false;
+    public bool knowsToolIsNeeded = false;
     public bool hasTool = false;
     public bool hasFuse = false;
     public bool hasPlayerRestoredPower = false;
     public bool isMonsterActive = false;
-    public bool knowsToolIsNeeded = false;
+    public bool isEndGame = false;
 
     // Timing
     public float powerOutageDelay = 10f;
@@ -160,6 +161,8 @@ public class GameManager : MonoBehaviour
     private void TriggerMonsterReveal()
     {
         isMonsterActive = true;
+        monsterController.gameObject.SetActive(true);
+        monsterController.PlayMonsterRoar();
         if (monsterAI != null) monsterAI.SetActive(true);
         ShowTemporaryMainCaption("What the hell is that! I need to get to my car!", 5f);
     }
@@ -226,6 +229,9 @@ public class GameManager : MonoBehaviour
 
     public void LoseGame()
     {
+        // End game
+        isEndGame = true;
+
         // Disable Player Controls
         if (playerControlScript != null)
         {

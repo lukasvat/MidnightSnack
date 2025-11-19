@@ -13,10 +13,16 @@ public class MonsterController : MonoBehaviour
     public Transform playerCamera;
     public float teleportDistance = 0.5f;
     public float scareHoldTime = 2f;
+    private AudioSource monsterAudioSource;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+    }
+
+    void Awake()
+    {
+        monsterAudioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -62,5 +68,10 @@ public class MonsterController : MonoBehaviour
         yield return new WaitForSecondsRealtime(scareHoldTime); 
 
         GameManager.Instance.ShowGameOverUI();
+    }
+
+    public void PlayMonsterRoar()
+    {
+        monsterAudioSource.Play();
     }
 }
