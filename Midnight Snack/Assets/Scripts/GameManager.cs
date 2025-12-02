@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public bool hasFuse = false;
     public bool hasPlayerRestoredPower = false;
     public bool isMonsterActive = false;
+    public bool hasSeenBody = false;
     public bool isEndGame = false;
 
     // Timing
@@ -27,7 +28,7 @@ public class GameManager : MonoBehaviour
     public float monsterSpawnDelay = 10f;
     public float typeSpeed = 0.05f;
 
-    // Misc vars
+    //Moonlight Intensity
     public float moonlightIntensity = 0.2f;
     public float darkMoonlightIntensity = 0.05f;
 
@@ -39,8 +40,10 @@ public class GameManager : MonoBehaviour
     public GameObject bodyToAppear;
     public GameObject bathroomFuseCover;
     public GameObject monsterAI;
-    public MonoBehaviour playerControlScript;
     public MonsterController monsterController;
+
+    // Scripts
+        public FirstPersonCamera playerControlScript;
 
     // UI
     public TextMeshProUGUI mainCaption;
@@ -131,6 +134,10 @@ public class GameManager : MonoBehaviour
         if (allStoreLights != null) allStoreLights.SetActive(false);
         if (phoneLight != null) phoneLight.SetActive(true);
         if (moonlight != null) moonlight.intensity = darkMoonlightIntensity;
+
+        // Start roar timer
+        StartCoroutine(RoarAfterPowerOutage(10f));
+
         ShowTemporaryMainCaption("Damn. Maybe there's a fuse box somewhere.", 5f);
         Debug.Log("Power went out");
     }
@@ -159,6 +166,16 @@ public class GameManager : MonoBehaviour
 
         // Start the monster spawn timer
         StartCoroutine(ActivateMonsterAfterDelay());
+    }
+
+    public void OnHasSeenBody()
+    {
+        if (hasSeenBody == false)
+        {
+            ShowTemporaryMainCaption("Oh my god...", 3f);
+            hasSeenBody = true;
+        }
+
     }
 
     // --- Helper Functions ---
@@ -218,6 +235,12 @@ public class GameManager : MonoBehaviour
 
         public void WinGame()
     {
+        //End game
+        isEndGame = true;
+
+        // Stop footsteps
+        playerControlScript.FootstepsStop();
+
         // Disable player controls
         if (playerControlScript != null)
         {
@@ -227,6 +250,7 @@ public class GameManager : MonoBehaviour
         // Hide the monster
         if (monsterController != null)
         {
+            monsterController.StopMonsterAudio();
             monsterController.gameObject.SetActive(false);
         }
 
@@ -247,6 +271,9 @@ public class GameManager : MonoBehaviour
         // End game
         isEndGame = true;
 
+        // Stop footsteps
+        playerControlScript.FootstepsStop();
+
         // Disable Player Controls
         if (playerControlScript != null)
         {
@@ -257,9 +284,10 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // Stop the Monster's Movement
+        // Stop the Monster's Movement and audio
         if (monsterController != null)
         {
+            monsterController.StopMonsterAudio();
             monsterController.enabled = false;
         }
 
@@ -287,5 +315,15 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenuScene");
+    }
+
+    private IEnumerator RoarAfterPowerOutage(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (monsterController != null)
+        {
+            monsterController.PlayMonsterRoarDistant();
+            ShowTemporaryMainCaption("What was that sound!?", 3f);
+        }
     }
     }

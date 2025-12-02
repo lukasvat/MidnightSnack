@@ -11,6 +11,7 @@ TagManager:
   - Monster
   - EntranceTrigger
   - BoundaryTrigger
+  - body
   layers:
   - Default
   - TransparentFX

@@ -103,6 +103,14 @@ public class FirstPersonCamera : MonoBehaviour
         }
     }
 
+        public void FootstepsStop()
+    {
+        if (footstepAudioSource.isPlaying)
+        {
+            footstepAudioSource.Stop();
+        }
+    }
+
     // Called when CharacterController enters a Trigger.
     private void OnTriggerEnter(Collider other)
     {

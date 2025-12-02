@@ -13,7 +13,9 @@ public class MonsterController : MonoBehaviour
     public Transform playerCamera;
     public float teleportDistance = 0.5f;
     public float scareHoldTime = 2f;
-    private AudioSource monsterAudioSource;
+    public AudioSource monsterRoarAudioSource; 
+    public AudioSource monsterDistantRoarAudioSource; 
+    public AudioSource monsterAmbientAudioSource;
 
     void Start()
     {
@@ -22,7 +24,6 @@ public class MonsterController : MonoBehaviour
 
     void Awake()
     {
-        monsterAudioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -58,6 +59,9 @@ public class MonsterController : MonoBehaviour
         }
         transform.rotation = finalRotation;
 
+        // Play Roar
+        PlayMonsterRoar();
+
         // Trigger attack animation
         Animator animator = GetComponent<Animator>();
         if (animator != null)
@@ -72,6 +76,25 @@ public class MonsterController : MonoBehaviour
 
     public void PlayMonsterRoar()
     {
-        monsterAudioSource.Play();
+        if (monsterRoarAudioSource != null)
+        {
+            monsterRoarAudioSource.Play();
+        }
+    }
+
+    public void PlayMonsterRoarDistant()
+    {
+        if (monsterDistantRoarAudioSource != null)
+        {
+            monsterDistantRoarAudioSource.Play();
+        }
+    }
+
+    public void StopMonsterAudio()
+    {
+        if (monsterAmbientAudioSource != null)
+        {
+            monsterAmbientAudioSource.Stop();
+        }
     }
 }

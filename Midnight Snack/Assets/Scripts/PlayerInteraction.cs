@@ -159,6 +159,11 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
+        if (closestCollider.gameObject.CompareTag("body"))
+        {
+            gm.OnHasSeenBody();
+        }
+
         // If we hit nothing interactable
         if (controlCaption != null)
         {
