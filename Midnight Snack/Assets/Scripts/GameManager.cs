@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
     public MonsterController monsterController;
 
     // Scripts
-        public FirstPersonCamera playerControlScript;
+    public FirstPersonCamera playerControlScript;
 
     // UI
     public TextMeshProUGUI mainCaption;
@@ -172,7 +172,7 @@ public class GameManager : MonoBehaviour
     {
         if (hasSeenBody == false)
         {
-            ShowTemporaryMainCaption("Oh my god...", 3f);
+            ShowTemporaryMainCaption("Oh my god...", 5f);
             hasSeenBody = true;
         }
 

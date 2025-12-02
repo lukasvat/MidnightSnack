@@ -159,6 +159,7 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
+        // Check for body
         if (closestCollider.gameObject.CompareTag("body"))
         {
             gm.OnHasSeenBody();
@@ -171,7 +172,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-private void HoldExistingItem(Pickupable item)
+    private void HoldExistingItem(Pickupable item)
     {
         heldItem = item.gameObject;
 

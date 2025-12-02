@@ -3,6 +3,7 @@ using System.Collections;
 
 public class InteractableDoor : MonoBehaviour
 {
+    public AudioSource hingeSound;
     public float openAngle = 90f;
     public float openSpeed = 2f;
     private bool isOpen = false;
@@ -40,6 +41,9 @@ public class InteractableDoor : MonoBehaviour
     private IEnumerator RotateDoor()
     {
         isMoving = true;
+
+        //Play sound
+        hingeSound.Play();
 
         // Determine target rotation
         Quaternion targetRotation = isOpen ? closedRotation : openRotation;
