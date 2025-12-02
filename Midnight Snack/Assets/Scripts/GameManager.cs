@@ -1,7 +1,6 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
-using UnityEditor.VersionControl;
 using UnityEngine.SceneManagement;
 
 // This script manages the main story events
@@ -28,11 +27,17 @@ public class GameManager : MonoBehaviour
     public float monsterSpawnDelay = 10f;
     public float typeSpeed = 0.05f;
 
+    // Misc vars
+    public float moonlightIntensity = 0.2f;
+    public float darkMoonlightIntensity = 0.05f;
+
     //Objects
     public GameObject allStoreLights;
     public GameObject bathroomLights;
+    public Light moonlight;
     public GameObject phoneLight;
     public GameObject bodyToAppear;
+    public GameObject bathroomFuseCover;
     public GameObject monsterAI;
     public MonoBehaviour playerControlScript;
     public MonsterController monsterController;
@@ -91,13 +96,15 @@ public class GameManager : MonoBehaviour
     {
         if (hasPlayerEnteredStation) return;
         hasPlayerEnteredStation = true;
-        ShowTemporaryMainCaption("Where is everyone? I'll just have come back later to pay.", 3f);
+        ShowTemporaryMainCaption("Where is everyone?", 3f);
+        Debug.Log("Station Entered");
     }
     public void OnBurgerPickedUp()
     {
         if (hasPlayerPickedUpBurger) return;
         hasPlayerPickedUpBurger = true;
         ShowTemporaryMainCaption("I need to heat this up.", 5f);
+        Debug.Log("Burger Picked Up");
     }
 
     public void OnMicrowaveUsed()
@@ -105,6 +112,7 @@ public class GameManager : MonoBehaviour
         if (hasPlayerUsedMicrowave) return;
         hasPlayerUsedMicrowave = true;
         ShowTemporaryMainCaption("30 seconds should do it.", 5f);
+        Debug.Log("Microwave Used");
 
         // Start the 10-second timer
         StartCoroutine(StartPowerOutageTimer());
@@ -113,13 +121,26 @@ public class GameManager : MonoBehaviour
     public void OnPlayerGotTool()
     {
         hasTool = true;
-        ShowTemporaryMainCaption("Now to get the fuse from the bathroom.", 5f);
+        ShowTemporaryMainCaption("Now to break open the fusebox.", 5f);
+        Debug.Log("Player has Tool");
+    }
+
+    private void TriggerPowerOutage()
+    {
+        isPowerOut = true;
+        if (allStoreLights != null) allStoreLights.SetActive(false);
+        if (phoneLight != null) phoneLight.SetActive(true);
+        if (moonlight != null) moonlight.intensity = darkMoonlightIntensity;
+        ShowTemporaryMainCaption("Damn. Maybe there's a fuse box somewhere.", 5f);
+        Debug.Log("Power went out");
     }
 
     public void OnPlayerGotFuse()
     {
         hasFuse = true;
         if (bathroomLights != null) bathroomLights.SetActive(false);
+        if (bathroomFuseCover != null) bathroomFuseCover.SetActive(false);
+        Debug.Log("Player has Fuse");
     }
 
     public void OnPowerRestored()
@@ -131,8 +152,10 @@ public class GameManager : MonoBehaviour
         if (allStoreLights != null) allStoreLights.SetActive(true);
         if (phoneLight != null) phoneLight.SetActive(false);
         if (bodyToAppear != null) bodyToAppear.SetActive(true);
+        if (moonlight != null) moonlight.intensity = moonlightIntensity;
 
         ShowTemporaryMainCaption("The power is restored! Let me check on the microwave.", 5f);
+        Debug.Log("Power is Restored");
 
         // Start the monster spawn timer
         StartCoroutine(ActivateMonsterAfterDelay());
@@ -143,14 +166,6 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(powerOutageDelay);
         TriggerPowerOutage();
-    }
-
-    private void TriggerPowerOutage()
-    {
-        isPowerOut = true;
-        if (allStoreLights != null) allStoreLights.SetActive(false);
-        if (phoneLight != null) phoneLight.SetActive(true);
-        ShowTemporaryMainCaption("Damn. Maybe there's a fuse box somewhere.", 5f);
     }
     private IEnumerator ActivateMonsterAfterDelay()
     {

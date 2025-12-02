@@ -166,34 +166,45 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    private void HoldExistingItem(Pickupable item)
+private void HoldExistingItem(Pickupable item)
+    {
+        heldItem = item.gameObject;
+
+        // Capture the original scale
+        Vector3 originalWorldScale = heldItem.transform.lossyScale;
+
+        heldItem.transform.SetParent(handSocket);
+
+        // Set its local position and rotation relative to the hand
+        heldItem.transform.localPosition = item.positionOffset;
+        heldItem.transform.localRotation = Quaternion.Euler(item.rotationOffset);
+
+        // Preserve scale
+        heldItem.transform.localScale = new Vector3(
+            originalWorldScale.x / handSocket.lossyScale.x,
+            originalWorldScale.y / handSocket.lossyScale.y,
+            originalWorldScale.z / handSocket.lossyScale.z
+        );
+
+        if (!GameManager.Instance.hasPlayerPickedUpBurger)
         {
-            heldItem = item.gameObject;
-            heldItem.transform.SetParent(handSocket);
-
-            // Set its local position and rotation relative to the hand
-            heldItem.transform.localPosition = item.positionOffset;
-            heldItem.transform.localRotation = Quaternion.Euler(item.rotationOffset);
-
-            if (!GameManager.Instance.hasPlayerPickedUpBurger)
-            {
-                GameManager.Instance.OnBurgerPickedUp();
-            }
-
-            Collider col = heldItem.GetComponent<Collider>();
-            if (col != null) col.enabled = false;
-            
-            Rigidbody rb = heldItem.GetComponent<Rigidbody>();
-            if (rb != null) rb.isKinematic = true;
-
-            // Tell GameManager if this is the tool
-            if (item.itemType == Pickupable.ItemType.Tool)
-            {
-                GameManager.Instance.OnPlayerGotTool();
-            }
-
-            ClearLookTargets();
+            GameManager.Instance.OnBurgerPickedUp();
         }
+
+        Collider col = heldItem.GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+
+        Rigidbody rb = heldItem.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = true;
+
+        // Tell GameManager if this is the tool
+        if (item.itemType == Pickupable.ItemType.Tool)
+        {
+            GameManager.Instance.OnPlayerGotTool();
+        }
+
+        ClearLookTargets();
+    }
 
     private GameObject PlaceHeldItem()
     {
