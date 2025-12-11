@@ -190,6 +190,12 @@ public class GameManager : MonoBehaviour
         TriggerMonsterReveal();
     }
 
+        private IEnumerator ActivateMonsterAfterDelayRetry()
+    {
+        yield return new WaitForSeconds(monsterSpawnDelay/2);
+        TriggerMonsterReveal();
+    }
+
     private void TriggerMonsterReveal()
     {
         isMonsterActive = true;
@@ -326,4 +332,68 @@ public class GameManager : MonoBehaviour
             ShowTemporaryMainCaption("What was that sound!?", 3f);
         }
     }
+
+    public void RetryFromPowerOn()
+        {
+            // Unpause the game
+            Time.timeScale = 1f;
+            isEndGame = false;
+            
+            // Hide UI
+            if (gameOverUI != null) gameOverUI.SetActive(false);
+            if (mainCaption != null) mainCaption.gameObject.SetActive(false);
+            
+            // Reset Cursor
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = true;
+
+            // Teleport Player
+            if (playerControlScript != null)
+            {
+                playerControlScript.enabled = true;
+                playerControlScript.FootstepsStop();
+                
+                // Teleport
+                CharacterController cc = playerControlScript.GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = false;
+                
+                playerControlScript.transform.position = new Vector3(-7.49992f, 1.08f, -22.20626f);
+                playerControlScript.transform.rotation = Quaternion.identity; 
+
+                if (cc != null) cc.enabled = true;
+            }
+
+            // Reset Monster State
+            if (monsterController != null)
+            {
+                monsterController.StopMonsterAudio();
+                
+                // Turn off the object
+                monsterController.gameObject.SetActive(false);
+                if (monsterAI != null) monsterAI.SetActive(false);
+
+                // Reset position and rotation
+                monsterController.transform.position = new Vector3(-7.837f, 0f, 13.55f); 
+                monsterController.transform.rotation = new Quaternion(0, 1, 0, 0);
+
+                // Re-enable the components
+                monsterController.enabled = true; 
+                UnityEngine.AI.NavMeshAgent agent = monsterController.GetComponent<UnityEngine.AI.NavMeshAgent>();
+                if (agent != null)
+                {
+                    agent.enabled = true;
+                }
+            }
+            isMonsterActive = false;
+
+            // Reset Environment State
+            if (allStoreLights != null) allStoreLights.SetActive(true);
+            if (phoneLight != null) phoneLight.SetActive(false);
+            if (moonlight != null) moonlight.intensity = moonlightIntensity;
+            if (bodyToAppear != null) bodyToAppear.SetActive(true);
+
+            // Restart the Scare Sequence
+            StopAllCoroutines(); 
+            StartCoroutine(ActivateMonsterAfterDelayRetry());
+        }
     }

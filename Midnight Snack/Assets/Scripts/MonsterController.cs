@@ -28,6 +28,11 @@ public class MonsterController : MonoBehaviour
 
     void Update()
     {
+        if (!agent.isActiveAndEnabled)
+        {
+            return;
+        }
+        
         pathTimer += Time.deltaTime;
         if (pathTimer > updatePathInterval)
         {
